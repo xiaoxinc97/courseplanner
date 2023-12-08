@@ -1,0 +1,13 @@
+section[id $= '_sec'] {
+    display: none;
+}
+.show {
+    display: block;
+}
+.hide {
+    display: block;
+}
+
+#schedule {
+    width: 50%;
+}

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>BU Course Planner</title>
+	<link rel="icon" href="./image/bu_icon.ico" type="image/x-icon">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link href="./styles/styles.css" rel="stylesheet">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+</head>
+
+<body>
+  	<div id="root" class="noPrint"></div>
+  	<div class="container-fluid">
+		<!-- Navigation window -->
+		<div id="menu" class="noPrint">
+			<!-- Navbar -->
+			<nav class="navbar navbar-expand-md navbar-light bg-lightl">
+				<a class="navbar-brand" href="#" id="webTitle">BUCoursePlanner</a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+				data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" 
+				aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				  </button>
+				<div class="collapse navbar-collapse" id="navbarSupportedContent">
+					<ul class="navbar-nav mr-auto">
+						<li class="nav-item">
+							<div id="userText" class="navbar-text ml-auto user-text"></div>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="#" onclick="showScheduleList()">Schedule</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Load</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="#" onclick="saveSchedule()">Save</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="#" onclick="logout()">Logout</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="#" onclick="printSchedule()">Print</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="#" onclick="clearScheduleList()">Clear</a>
+						</li>
+						<li class="nav-item">
+							<div id="unitText" class="navbar-text ml-auto unit-text">Unit: 10</div>
+						</li>
+					</ul>
+				</div>
+			</nav>
+			<!-- Login Modal -->
+			<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" 
+			aria-hidden="true">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="loginModalLabel">Login</h5>
+							<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<div class="modal-body">
+							<form id="loginForm">
+								<div class="form-group">
+									<label for="username">Username</label>
+									<input type="text" class="form-control" id="username" placeholder="Enter username">
+								</div>
+								<div class="form-group">
+									<label for="otp">OTP</label>
+									<input type="number" class="form-control" id="otp" placeholder="Enter the authentication code">
+								</div>
+							</form>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+							<button type="button" class="btn btn-primary" data-bs-dismiss="modal" data-bs-toggle="modal"
+							data-bs-target="#registerModal">Register</button>
+							<button type="button" class="btn btn-success" data-bs-dismiss="modal"
+							onclick="validateOTP('username', 'otp')">Load</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- Register Modal -->
+			<div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel"
+			aria-hidden="true">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="registerModalLabel">Register</h5>
+							<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<div class="modal-body">
+							<form id="registerForm">
+								<div class="form-group">
+									<label for="registerUsername">Username</label>
+									<input type="text" class="form-control" id="registerUsername" placeholder="Enter username">
+									<input type="hidden" id="registerTotpSecret">
+								</div>
+								<div class="form-group">
+									<label for="registerOtp">OTP</label>
+									<input type="number" class="form-control" id="registerOtp" placeholder="Enter the authentication code">
+								</div>
+								<br>
+								<div class="form-group" id="qrCodeContainer">
+								</div>
+							</form>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+							<button type="button" class="btn btn-primary" onclick="generateQRcode()">Generate</button>
+							<button type="button" class="btn btn-success"
+							onclick="confirmRegistration('registerUsername', 'registerTotpSecret')"
+							data-bs-dismiss="modal">Confirm</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Main window -->
+		<div class="row">
+			<!-- Schedule chart -->
+			<div id="schedule-container" class="col-md-6">
+				<svg id="schedule"></svg>
+			</div>
+			<!-- Add course window -->
+			<div id="add-course-window" class="col-md-6 noPrint">
+				<h1 class="text-center">Search Course</h1>
+				<form name="SemForm" class="row align-items-center">
+					<!-- Select Semester -->
+					<div class="col-md-2">
+						<div class="select-label-1">Select:</div>
+					</div>
+					<div class="col-md-2">
+						<div class="select-label-2">Semester</div>
+					</div>
+					<div class="col-md-2">
+						<label for="semesterSelect" class="d-block mb-0">Semester</label>
+						<select id="semesterSelect" class="form-control" name="KeySem">
+						</select>
+					</div>
+				</form>
+				<br>
+				<div class="col-md-12">
+				<div class="select-label-1">and</div>
+				</div>
+				<br>
+				<div class="col-md-12">
+				<div class="select-label-1">Search by:</div>
+				</div>
+				<br>
+				<form name="ClassNumForm" method="GET" class="row align-items-center">
+					<!-- Search by Class Number -->
+					<div class="col-md-2">
+						<div class="select-label-2">Class Number</div>
+					</div>
+					<div class="col-md-2">
+						<label for="collegeSelect" class="d-block mb-0">College</label>
+						<select id="collegeSelect" class="form-control" name="College">
+						<option selected>select...</option>
+						</select>
+					</div>
+					<div class="col-md-2">
+						<label for="deptInput" class="d-block mb-0">Dept</label>
+						<input type="text" class="form-control" id="deptInput" placeholder="(optnl)" name="Dept">
+					</div>
+					<div class="col-md-2">
+						<label for="courseInput" class="d-block mb-0">Course</label>
+						<input type="text" class="form-control" id="courseInput" placeholder="(optnl)" name="Course">
+					</div>
+					<div class="col-md-2">
+						<label for="sectionInput" class="d-block mb-0">Section</label>
+						<input type="text" class="form-control" id="sectionInput" placeholder="(optnl)" name="Section">
+					</div>
+					<div class="col-md-2">
+						<label for="MainCampus-1" class="d-block mb-0 checkbox-label">Charles River Campus Only</label>
+						<input type="checkbox" class="form-check-input" id="MainCampus-1" value="Y" name="MainCampusInd">
+					</div>
+					<div class="d-flex justify-content-end flex-wrap">
+						<button type="submit" class="btn btn-primary mb-2" onclick="searchByClassNum(event)">Search</button>
+					</div>
+				</form>
+				<hr>
+				<form name="SubjectForm" method="GET" class="row align-items-center">
+					<!-- Search by Class Subject -->
+					<div class="col-md-2">
+						<div class="select-label-2">Class Subject</div>
+					</div>
+					<div class="col-md-4">
+						<label for="subjectSelect" class="d-block mb-0">Subject</label>
+						<select id="subjectSelect" class="form-control" name="Subject">
+						</select>
+					</div>
+					<div class="col-md-2">
+						<label for="MtgDaySelect" class="d-block mb-0">Day</label>
+						<select id="MtgDaySelect" class="form-control" name="MtgDay">
+						</select>
+					</div>
+					<div class="col-md-2">
+						<label for="MtgTimeSelect" class="d-block mb-0">Time</label>
+						<select id="MtgTimeSelect" class="form-control" name="MtgTime">
+						</select>
+					</div>
+					<div class="col-md-2">
+						<label for="MainCampus-2" class="d-block mb-0 checkbox-label">Charles River Campus Only</label>
+						<input type="checkbox" class="form-check-input" id="MainCampus-2" value="Y" name="MainCampusInd">
+					</div>
+					<div class="d-flex justify-content-end flex-wrap">
+						<button type="submit" class="btn btn-primary mb-2" onclick="searchByClassSubject(event)">Search</button>
+					</div>
+				</form>
+				<hr>
+				<form name="DistLearnForm" method="GET" class="row align-items-center">
+					<!-- Search Online Classes -->
+					<div class="col-md-2">
+						<div class="select-label-2">Online Classes</div>
+					</div>
+					<div class="d-flex justify-content-end flex-wrap">
+						<button type="submit" class="btn btn-primary mb-2" onclick="searchByOnlineCourse(event)">Search</button>
+					</div>
+				</form>
+			</div>
+			<!-- course result window -->
+			<div id="course-result-window" class="col-md-6 noPrint">
+				<br>
+				<div class="col-md-12">
+					<button type="submit" class="btn btn-secondary mb-2 noPrint" onclick="backToAddCourse()">Back</button>
+					<button type="submit" class="btn btn-success mb-2 noPrint" onclick="jumpToChart()" 
+					id="chartButton">Chart</button>
+					<button type="submit" class="btn btn-success mb-2 noPrint" onclick="jumpToTable()" 
+					id="tableButton">Course</button>
+					<button type="submit" class="btn btn-primary mb-2 noPrint" id="continueButton"
+						onclick="continueSearch()">Continue</button>
+					<button type="submit" class="btn btn-danger mb-2" id="deleteButton">Delete</button>
+					<!-- continue from -->
+					<input type="hidden" id="lastCol">
+					<input type="hidden" id="lastDept">
+					<input type="hidden" id="lastCrse">
+					<input type="hidden" id="lastSec">
+					<input type="hidden" id="lastSem">
+					<input type="hidden" id="crc">
+					<!-- course result table -->
+					<table class="table table-striped scrollable-table" id="course-search-result">
+						<thead>
+							<tr>
+								<th>Class</th>
+								<th>Title<br>/Instructor</th>
+								<th>Cr<br>Hrs</th>
+								<th>Type</th>
+								<th>Open<br>Seats</th>
+								<th>Bld</th>
+								<th>Room</th>
+								<th>Day</th>
+								<th>Start</th>
+								<th>Stop</th>
+								<th>Notes</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+					<!-- schedule table -->
+					<table class="table table-striped" id="schedule-list">
+						<thead>
+							<tr>
+								<th>Class</th>
+								<th>Title<br>/Instructor</th>
+								<th>Cr<br>Hrs</th>
+								<th>Type</th>
+								<th>Open<br>Seats</th>
+								<th>Bld</th>
+								<th>Room</th>
+								<th>Day</th>
+								<th>Start</th>
+								<th>Stop</th>
+								<th>Notes</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+
+    <!-- Include library and script -->
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <script src="./modules/schedule.js"></script>
+    <script src="./modules/courseplanner.js"></script>
+    <script src="./modules/course.js"></script>
+
+    <script>
+      	let selectedRow = null;
+
+		const serverURI = "http://localhost:5000";
+		window.addEventListener("DOMContentLoaded", () => {
+			populateOptions();
+			loadSchedule();
+			// Listen for a click event on course-search-result and handles the course addition on 
+			let sourceTable = document.querySelector("#course-search-result tbody");
+			sourceTable.addEventListener("click", handleCourseSelection);
+		});
+		// Reload the schedule whenever the window size changes
+		window.addEventListener("resize", reloadSchedule);
+		// Reset the login form whenever the dialog box is hidden 
+		document.getElementById("loginModal").addEventListener("hidden.bs.modal", resetLoginForm);
+		// Reset the register form whenever the dialog box is hidden
+		document.getElementById("registerModal").addEventListener("hidden.bs.modal", resetRegisterForm);
+		// Record the selected table row
+		document.querySelector('#schedule-list tbody').addEventListener('click', function (event) {
+			let target = event.target;
+			if (target.tagName.toLowerCase() === 'td') {
+			selectedRow = target.parentNode;
+			}
+		});
+		// Delete the selected table row
+		document.getElementById('deleteButton').addEventListener('click', function (event) {
+			event.preventDefault();
+			if (selectedRow) {
+			selectedRow.remove();
+			selectedRow = null;
+			reloadSchedule();
+			}
+		});
+		// Print the schedule chart
+		function printSchedule() {
+			window.print();
+		}
+
+    </script>
+</body>
+
+</html>

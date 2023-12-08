@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bar Chart as Table with Solid Grid Lines</title>
+  <link rel="icon" href="images/bu_icon.ico" type="image/x-icon">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="./styles/styles.css" rel="stylesheet" >
+</head>
+<body>
+  <div id="chart-container">
+    <svg id="chart"></svg>
+  </div>
+
+  <!-- Include D3.js library -->
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+
+  <script>
+    // Data for the y-axis intervals (30-minute intervals from 7:00am to 10:00pm)
+    const timeIntervals = [];
+    for (let hour = 7; hour <= 22; hour++) {
+      for (let minute = 0; minute <= 55; minute += 5) {
+        timeIntervals.push(`${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`);
+      }
+    }
+
+    // Data for the bar chart
+    const data = [
+
+    ];
+
+    // Define chart dimensions
+    const margin = { top: 30, right: 30, bottom: 60, left: 60 };
+    const width = 500 - margin.left - margin.right;
+    const height = 13 * 70 - margin.top - margin.bottom; // Set height for 13 intervals
+
+    // Create x and y scales
+    const xScale = d3.scaleBand()
+      .domain(['Mon', 'Tue', 'Wed', 'Thu', 'Fri'])
+      .range([0, width])
+      .padding(0.1);
+
+    const yScale = d3
+      .scaleBand()
+      .domain(timeIntervals.map(timeToMinutes))
+      .range([0, height])
+      .paddingInner(1) // Use paddingInner to center the bars within the intervals
+      .paddingOuter(0.1);
+
+    console.log(timeIntervals.map(timeToMinutes))
+
+    // Create the SVG element
+    const svg = d3.select('#chart')
+      .append('g')
+      .attr('transform', `translate(${margin.left},${margin.top})`);
+
+    // Create horizontal grid lines
+    svg.selectAll('.grid-line')
+      .data(timeIntervals.filter((_, i) => i % 6 === 0))
+      .enter()
+      .append('line')
+      .attr('class', 'grid-line')
+      .attr('x1', 0)
+      .attr('x2', width)
+      .attr('y1', d => yScale(timeToMinutes(d)) + yScale.bandwidth() / 2)
+      .attr('y2', d => yScale(timeToMinutes(d)) + yScale.bandwidth() / 2);
+
+    // Create vertical grid lines between each two weekday columns
+    svg.selectAll('.weekday-separator')
+      .data(['Mon', 'Tue', 'Wed', 'Thu'])
+      .enter()
+      .append('line')
+      .attr('class', 'grid-line')
+      .attr('x1', d => xScale(d) + xScale.bandwidth())
+      .attr('x2', d => xScale(d) + xScale.bandwidth())
+      .attr('y1', 0)
+      .attr('y2', height);
+
+    // Create the bars
+    svg.selectAll('.bar')
+      .enter()
+      .append('rect')
+      .attr('class', 'bar')
+      .attr('x', d => xScale(d.day))
+      .attr('y', d => yScale(timeToMinutes(d.value))) // Map value to numeric y position
+      .attr('width', xScale.bandwidth())
+      .attr('height', d => height - yScale(timeToMinutes(d.value))); // Adjust height accordingly
+
+    // Create x-axis (at the top) and hide the ticks
+    svg.append('g')
+      .attr('class', 'x-axis')
+      .attr('transform', `translate(0, , ${-margin.top})`)
+      .call(d3.axisTop(xScale).tickSize(0));
+
+    // Create y-axis (at the left) and customize tick format
+    svg.append('g')
+      .attr('class', 'y-axis')
+      .call(d3.axisLeft(yScale)
+      .tickValues(d3.range(420, 1380, 60))
+      .tickFormat(d => timeFormatter(d)).tickSize(0));
+
+    // Create the solid right line
+    svg.append('line')
+      .attr('class', 'grid-line y-axis-line')
+      .attr('x1', width)
+      .attr('x2', width)
+      .attr('y1', 0)
+      .attr('y2', height);
+
+    // Create the solid bottom line
+    svg.append('line')
+      .attr('class', 'grid-line x-axis-line')
+      .attr('x1', 0)
+      .attr('x2', width)
+      .attr('y1', height)
+      .attr('y2', height);
+
+    // Helper function to convert time to minutes
+          function timeToMinutes(time) {
+        const [hour, minute] = time.split(':').map(Number);
+        return hour * 60 + minute;
+      }
+
+      // Helper function to format minutes as "hh:mm" time string
+      function timeFormatter(minutes) {
+        const hours = Math.floor(minutes / 60);
+        const mins = minutes % 60;
+        return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+      }
+
+      const courseData = {
+      day: 'Wed',
+      startTime: '9:00',
+      endTime: '11:50'
+    };
+
+    // Calculate the position and height for the course bar
+    const startTimeMinutes = timeToMinutes(courseData.startTime);
+    const endTimeMinutes = timeToMinutes(courseData.endTime);
+    const courseHeight = Math.abs(yScale(endTimeMinutes) - yScale(startTimeMinutes));
+    console.log(courseHeight);
+    const courseWidth = xScale('Wed') - xScale('Tue');
+
+    // Add the course bar
+    svg.append('rect')
+      .attr('class', 'bar')
+      .attr('x', xScale(courseData.day) - 8)
+      .attr('y', startTimeMinutes < endTimeMinutes ? yScale(startTimeMinutes) : yScale(endTimeMinutes))
+      .attr('width', courseWidth)
+      .attr('height', courseHeight)
+      .style('fill', 'orange');
+
+    // Add the course label
+    svg.append('text')
+      .attr('x', xScale(courseData.day) + xScale.bandwidth() / 2)
+      .attr('y', (startTimeMinutes < endTimeMinutes ? yScale(startTimeMinutes) : yScale(endTimeMinutes)) + courseHeight / 2)
+      .attr('dy', '0.35em')
+      .style('text-anchor', 'middle')
+      .style('font-size', '10px')
+      .style('fill', 'black')
+      .text('MET CS 601');
+
+  </script>
+</body>
+</html>

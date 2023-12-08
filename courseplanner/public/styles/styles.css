@@ -1,0 +1,230 @@
+
+body, html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.add-course-window {
+    display: block;
+}
+
+#course-result-window {
+    display: none;
+    overflow: auto;
+    max-height: 800px;
+}
+
+#course-search-result tbody tr td:first-child,
+#schedule-list tbody tr td:first-child {
+    font-weight: bold;
+    font-style: italic;
+    font-family: 'Times New Roman';
+}
+
+#course-search-result tbody tr td:not(:first-child),
+#schedule-list tbody tr td:not(:first-child) {
+    font-family: 'Verdana';
+    font-size: small;
+}
+
+#course-search-result tbody tr td:last-child,
+#schedule-list tbody tr td:last-child {
+    font-size: smaller;
+}
+
+#course-search-result tbody tr td:last-child:before,
+#schedule-list tbody tr td:last-child:before {
+    content: "📝";
+}
+
+#course-search-result tbody tr td:nth-child(2):after,
+#schedule-list tbody tr td:nth-child(2):after {
+    content: "👨‍🏫";
+}
+
+#course-search-result tbody tr td:nth-child(5):before,
+#schedule-list tbody tr td:nth-child(5):before {
+    content: "🪑";
+}
+
+#course-search-result tbody tr td:nth-child(6):before,
+#schedule-list tbody tr td:nth-child(6):before {
+    content: "🏢";
+}
+
+#course-search-result tbody tr td:nth-child(8):before,
+#schedule-list tbody tr td:nth-child(8):before {
+    content: "📅";
+}
+
+#course-search-result tbody tr td:nth-child(9):before,
+#schedule-list tbody tr td:nth-child(9):before {
+    content: "🕗";
+}
+
+#course-search-result tbody tr td:nth-child(10):before,
+#schedule-list tbody tr td:nth-child(10):before {
+    content: "🕗";
+}
+
+#course-search-result tbody tr:hover td,
+#schedule-list tbody tr:hover td {
+    background-color: lightgrey;
+}
+
+#schedule-container {
+    min-height: 680px;
+    max-height: 800px;
+}
+
+.scrollable-table {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.scrollable-table thead tr {
+    position: sticky;
+    top: 0;
+    z-index: 1; 
+}
+
+svg {
+    width: 100%;
+    height: 100%;
+}
+
+.y-axis text {
+    font-size: 16px;
+    fill: #000000;
+    font-family: 'Times New Roman', serif;
+}
+
+
+.x-axis text {
+    font-size: 18px;
+    fill: #000000;
+    font-family: 'Times New Roman', serif;
+}
+
+.bar {
+    fill: steelblue;
+}
+
+.x-axis {
+    font-size: 12px;
+    text-anchor: middle;
+}
+
+.x-axis .tick line {
+    display: none;
+}
+
+.y-axis {
+    font-size: 10px;
+    text-anchor: end;
+}
+
+.grid-line {
+    stroke: #ccc;
+    stroke-width: 1;
+}
+
+.x-axis line,
+.x-axis path,
+.x-axis-line {
+    stroke: #000;
+}
+
+.y-axis line,
+.y-axis path,
+.y-axis-line {
+    stroke: #000;
+}
+
+.course-label {
+    text-anchor: middle;
+    font-size: medium;
+    fill: black;
+    font-family: 'Times New Roman', serif;
+    font-weight: bold;
+}
+
+.select-label-1 {
+    font-style: oblique;
+    font-weight: bolder;
+    font-size: large;
+}
+
+.select-label-2 {
+    font-style: italic;
+    font-weight:bold;
+    font-size: medium;
+}
+
+.checkbox-label {
+    font-size: small;
+}
+
+#webTitle {
+    font-weight: bolder;
+    font-size: large;
+    font-style: italic;
+    font-family: 'Times New Roman';
+}
+
+.unit-text {
+    color: #376bda;
+    font-weight: bold;
+}
+
+.user-text {
+    color: #1d4bad;
+    font-weight: bold;
+    display: none;
+}
+
+.user-text::before {
+    content: "👤 ";
+}
+
+.navbar {
+    overflow: auto;
+}
+
+#add-course-window button + button {
+    margin-left: 10px;
+}
+
+li + li {
+    margin-left: 10px;
+}
+
+div + div {
+    margin-top: 15px;
+}
+
+@media print {
+    .noPrint, .no-print * {
+        display: none !important;
+    }
+}
+
+/* For Tablet and Desktop */
+@media screen and (min-width:768px) {
+    #chartButton, #tableButton {
+        display: none;
+    }
+
+}
+
+/* For Phone */
+@media screen and (max-width:767px) {
+    #chartButton, #tableButton {
+        display: inline-block;
+    }
+    .course-label {
+        font-size: small;
+    }
+}
+
